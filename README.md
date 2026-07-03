@@ -11,27 +11,6 @@
 - Nginx + Gunicorn
 - HTML / CSS / JavaScript
 
-## 本地运行
-
-```bash
-pip install -r requirements.txt
-```
-
-复制 `.env.example` 为 `.env`，填写 MySQL 密码：
-
-```bash
-copy .env.example .env
-```
-
-创建数据库后执行迁移并启动：
-
-```bash
-python manage.py migrate
-python manage.py runserver
-```
-
-浏览器访问：http://127.0.0.1:8000
-
 ## 腾讯云部署
 
 项目部署在腾讯云轻量应用服务器（Ubuntu），使用 Nginx 反向代理 + Gunicorn 运行 Django，MySQL 作为数据库。
@@ -43,5 +22,3 @@ python manage.py runserver
 3. `pip install -r requirements.txt`
 4. `python manage.py migrate` 与 `python manage.py collectstatic`
 5. 配置 Gunicorn 系统服务与 Nginx（`/static/`、`/media/`）
-
-本地开发与线上均使用 MySQL，通过 `.env` 配置连接信息。
