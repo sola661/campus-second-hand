@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}注册 - 校园二手交易平台{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-form-error {
+        margin-bottom: 1rem;
+        min-height: 0;
+    }
+    .auth-form-error-text {
+        display: block;
+        color: #dc2626;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        text-align: center;
+        animation: authErrorIn 0.25s ease;
+    }
+    @keyframes authErrorIn {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="card auth-card">
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <svg width="44" height="44" viewBox="0 0 48 48" stroke="#f97316" stroke-width="1.6" fill="none" class="handdrawn-icon mb-2">
+                    <path d="M16 28c0-8 16-8 16 0v2"/>
+                    <path d="M18 18a6 6 0 0112 0"/>
+                    <path d="M14 34c0-4 20-4 20 0v2"/>
+                    <path d="M16 28h16" stroke-width="1" opacity="0.3"/>
+                </svg>
+                <h4 class="fw-semibold" style="color: #1e293b;">创建账号</h4>
+                <p class="text-muted small" style="color: #94a3b8;">加入校园二手交易</p>
+            </div>
+
+            <form id="registerForm">
+                {% csrf_token %}
+                <div id="msgArea" class="auth-form-error">
+                    {% if messages %}
+                        {% for msg in messages %}
+                        <div class="auth-form-error-text" role="alert">{{ msg }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="username">用户名</label>
+                    <input type="text" class="form-control" id="username" name="username"
+                           placeholder="1~20位中文/字母/数字/下划线" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="password1">密码</label>
+                    <div class="position-relative">
+                        <input type="password" class="form-control" id="password1" name="password1"
+                               placeholder="至少8位，含大小写字母+数字" required style="padding-right: 44px;">
+                        <button type="button" class="togglePw"
+                                data-target="password1"
+                                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;padding:6px;line-height:1;cursor:pointer;color:#94a3b8;"
+                                tabindex="-1">
+                            <svg class="eye-open" width="20" height="20" viewBox="0 0 28 28" stroke="currentColor" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                                <circle cx="14" cy="14" r="4.5"/>
+                                <path d="M2 14c3-6 7-9 12-9s9 3 12 9c-3 6-7 9-12 9s-9-3-12-9z"/>
+                            </svg>
+                            <svg class="eye-closed" width="20" height="20" viewBox="0 0 28 28" stroke="currentColor" stroke-width="1.4" fill="none" class="handdrawn-icon" style="display:none;">
+                                <path d="M4 4l20 20"/>
+                                <circle cx="14" cy="14" r="4.5"/>
+                                <path d="M2 14c3-6 7-9 12-9s9 3 12 9c-3 6-7 9-12 9s-9-3-12-9z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" for="password2">确认密码</label>
+                    <div class="position-relative">
+                        <input type="password" class="form-control" id="password2" name="password2"
+                               placeholder="再次输入密码" required style="padding-right: 44px;">
+                        <button type="button" class="togglePw"
+                                data-target="password2"
+                                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;padding:6px;line-height:1;cursor:pointer;color:#94a3b8;"
+                                tabindex="-1">
+                            <svg class="eye-open" width="20" height="20" viewBox="0 0 28 28" stroke="currentColor" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                                <circle cx="14" cy="14" r="4.5"/>
+                                <path d="M2 14c3-6 7-9 12-9s9 3 12 9c-3 6-7 9-12 9s-9-3-12-9z"/>
+                            </svg>
+                            <svg class="eye-closed" width="20" height="20" viewBox="0 0 28 28" stroke="currentColor" stroke-width="1.4" fill="none" class="handdrawn-icon" style="display:none;">
+                                <path d="M4 4l20 20"/>
+                                <circle cx="14" cy="14" r="4.5"/>
+                                <path d="M2 14c3-6 7-9 12-9s9 3 12 9c-3 6-7 9-12 9s-9-3-12-9z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-solid-orange w-100 py-2">注册</button>
+            </form>
+
+            <p class="text-center mt-3 mb-0 small" style="color: #94a3b8;">
+                已有账号？<a href="{% url 'login' %}" style="color: var(--blue);">立即登录</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+function showRegisterError(msg) {
+    var area = document.getElementById('msgArea');
+    var el = area.querySelector('.auth-form-error-text');
+    if (!el) {
+        el = document.createElement('div');
+        el.className = 'auth-form-error-text';
+        el.setAttribute('role', 'alert');
+        area.appendChild(el);
+    }
+    el.textContent = msg;
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
+}
+
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var u = document.getElementById('username').value.trim();
+    var p1 = document.getElementById('password1').value;
+    var p2 = document.getElementById('password2').value;
+    var ur = /^[一-龥a-zA-Z0-9_]{1,20}$/;
+    if (!ur.test(u)) { showRegisterError('用户名必须由1~20位的中文,字母，数字或下划线组成'); return; }
+    var pr = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!pr.test(p1)) { showRegisterError('密码必须是8位及以上，含大小写字母+数字'); return; }
+    if (p1 !== p2) {
+        showRegisterError('两次密码不一致');
+        document.getElementById('password2').value = '';
+        document.getElementById('password2').focus();
+        return;
+    }
+    var fd = new URLSearchParams();
+    fd.append('username', u);
+    fd.append('password1', p1);
+    fd.append('password2', p2);
+    fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    fetch('{% url "register" %}', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: fd.toString()
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.code === 200) { window.location.href = '{% url "login" %}'; }
+        else { showRegisterError(d.msg); }
+    })
+    .catch(function() { showRegisterError('网络错误，请稍后重试'); });
+});
+
+document.querySelectorAll('.togglePw').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var inp = document.getElementById(this.dataset.target);
+        var open = this.querySelector('.eye-open');
+        var closed = this.querySelector('.eye-closed');
+        if (inp.type === 'password') {
+            inp.type = 'text';
+            open.style.display = 'none';
+            closed.style.display = '';
+        } else {
+            inp.type = 'password';
+            open.style.display = '';
+            closed.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

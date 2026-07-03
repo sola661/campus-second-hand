@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ good.title }} - 校园二手交易平台{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- Left: Image -->
+                    <div class="col-md-5">
+                        <div style="height: 280px; overflow: hidden; border-radius: 12px; background: #f8fafc;">
+                            {% if good.image %}
+                            <img src="{% url 'goods:serve_image' good.id %}" alt="{{ good.title }}"
+                                 style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                            {% else %}
+                            <div class="d-flex align-items-center justify-content-center h-100">
+                                <svg width="72" height="72" viewBox="0 0 48 48" stroke="#cbd5e1" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                                    <rect x="8" y="12" width="32" height="28" rx="3"/>
+                                    <path d="M16 12V8a2 2 0 012-2h12a2 2 0 012 2v4"/>
+                                    <path d="M18 26l6 6 12-12" stroke-width="1.6"/>
+                                </svg>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Right: Info -->
+                    <div class="col-md-7">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge" style="background: #eef2ff; color: #2563eb; font-weight: 400; font-size: 0.8rem; padding: 4px 14px; border-radius: 20px;">
+                                {{ category_name }}
+                            </span>
+                            {% if good.is_active %}
+                            <span class="badge" style="background: #dcfce7; color: #166534; font-weight: 400; font-size: 0.75rem; padding: 3px 10px; border-radius: 20px;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" stroke="#166534" stroke-width="2.5" fill="none" class="handdrawn-icon me-1"><path d="M20 6L9 17l-5-5"/></svg>
+                                在售
+                            </span>
+                            {% else %}
+                            <span class="badge" style="background: #f1f5f9; color: #64748b; font-weight: 400; font-size: 0.75rem; padding: 3px 10px; border-radius: 20px;">已售空</span>
+                            {% endif %}
+                        </div>
+
+                        <h4 class="fw-semibold mb-2" style="color: #1e293b;">{{ good.title }}</h4>
+
+                        <div class="price mb-3" style="color: var(--orange); font-weight: 700; font-size: 1.6rem;">¥{{ good.price }}</div>
+
+                        <div class="d-flex flex-column gap-2 mb-3" style="font-size: 0.88rem; color: #64748b;">
+                            <div class="d-flex align-items-center gap-2">
+                                <svg width="16" height="16" viewBox="0 0 24 24" stroke="#94a3b8" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                                    <circle cx="12" cy="8" r="4"/>
+                                    <path d="M4 22c0-6 16-6 16 0"/>
+                                </svg>
+                                <span>发布者：<strong style="color: #1e293b;">{{ good.user.username }}</strong></span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <svg width="16" height="16" viewBox="0 0 24 24" stroke="#94a3b8" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v6l4 2"/>
+                                </svg>
+                                <span>上架时间：{{ good.create_time|date:"Y-m-d H:i" }}</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% if good.is_active %}
+                            <form method="POST" action="{% url 'orders:orders' good.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-solid-orange rounded-pill px-4" style="border:none;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" fill="none" class="handdrawn-icon me-1">
+                                        <path d="M6 6h14l-2 10H6L4 4H2"/>
+                                        <circle cx="8" cy="20" r="2"/>
+                                        <circle cx="16" cy="20" r="2"/>
+                                    </svg>
+                                    立即购买
+                                </button>
+                            </form>
+                            {% if user.is_authenticated and user == good.user %}
+                            <a href="{% url 'goods:deactivate' good.id %}"
+                               class="btn rounded-pill px-3" style="background:#fef2f2;color:#dc2626;border:none;font-size:0.85rem;"
+                               onclick="return confirm('确定要下架该商品吗？');">
+                                <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" fill="none" class="handdrawn-icon me-1">
+                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                </svg>
+                                下架
+                            </a>
+                            {% endif %}
+                            {% else %}
+                            <span class="btn rounded-pill px-4" style="background:#e2e8f0;color:#94a3b8;border:none;cursor:default;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" stroke="#94a3b8" stroke-width="1.6" fill="none" class="handdrawn-icon me-1">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M15 9l-6 6M9 9l6 6"/>
+                                </svg>
+                                已售空
+                            </span>
+                            {% endif %}
+                            <a href="{% url 'goods:goods' %}"
+                               class="btn btn-outline-secondary rounded-pill px-4" style="border-color: #e2e8f0; color: #64748b;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" fill="none" class="handdrawn-icon me-1">
+                                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                                </svg>
+                                返回首页
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description Section -->
+                {% if good.description %}
+                <hr class="my-4" style="border-color: #eef2f6;">
+                <div>
+                    <h6 class="fw-semibold mb-2" style="color: #1e293b;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" stroke="#2563eb" stroke-width="1.6" fill="none" class="handdrawn-icon me-1">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <path d="M14 2v6h6"/>
+                        </svg>
+                        商品描述
+                    </h6>
+                    <p class="text-muted mb-0" style="font-size: 0.92rem; color: #475569 !important; line-height: 1.7; white-space: pre-wrap;">{{ good.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

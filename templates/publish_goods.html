@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}发布商品 - 校园二手交易平台{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <svg width="40" height="40" viewBox="0 0 48 48" stroke="#2563eb" stroke-width="1.4" fill="none" class="handdrawn-icon mb-2">
+                        <rect x="10" y="14" width="28" height="28" rx="3"/>
+                        <path d="M16 14V10a2 2 0 012-2h12a2 2 0 012 2v4"/>
+                        <path d="M22 26l4 4 6-6" stroke-width="1.6"/>
+                        <path d="M16 32h16" stroke-width="1" opacity="0.3"/>
+                    </svg>
+                    <h5 class="fw-semibold" style="color: #1e293b;">发布闲置商品</h5>
+                    <p class="text-muted small" style="color: #94a3b8;">让闲置找到新主人</p>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show py-2 small" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label" for="title">商品标题 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title"
+                               placeholder="输入商品名称" required maxlength="100">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="category">商品分类</label>
+                        <select class="form-control" id="category" name="category">
+                            <option value="">请选择分类</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="price">价格（元） <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="price" name="price"
+                               placeholder="0.00" required step="0.01" min="0">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="description">商品描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="4"
+                                  placeholder="描述商品的成色、购入时间、转让原因等"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" for="image">商品图片</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <div class="form-text small text-muted">支持 JPG、PNG 格式，建议图片比例 1:1</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-solid-orange rounded-pill px-4 flex-grow-1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" fill="none" class="handdrawn-icon me-1">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            发布商品
+                        </button>
+                        <a href="{% url 'goods:goods' %}" class="btn btn-outline-secondary rounded-pill px-4"
+                           style="border-color: #e2e8f0; color: #64748b;">取消</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

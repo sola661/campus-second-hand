@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}首页 - 校园二手交易平台{% endblock %}
+
+{% block content %}
+
+<!-- ===== Banner ===== -->
+<div class="banner-section">
+    <div class="banner-illustration left">
+        <svg width="90" height="90" viewBox="0 0 80 80" stroke="#2563eb" stroke-width="1.2" fill="none" class="handdrawn-icon">
+            <path d="M20 30c0-10 14-14 20-14s20 4 20 14v8"/>
+            <path d="M16 34c0-6 4-10 8-10s8 4 8 8" stroke-width="1"/>
+            <path d="M36 50h8v22h-8z"/>
+            <path d="M30 60c0-6 4-10 10-10s10 4 10 10" stroke-width="1"/>
+            <path d="M48 42c0-4 4-6 8-6s8 2 8 6" stroke-width="1"/>
+            <path d="M22 44l-6 6M58 44l6 6" stroke-width="1" opacity="0.5"/>
+            <!-- book stack -->
+            <rect x="10" y="58" width="14" height="4" rx="1" stroke-width="1" opacity="0.5"/>
+            <rect x="12" y="54" width="12" height="4" rx="1" stroke-width="1" opacity="0.35"/>
+        </svg>
+    </div>
+    <h1>校园二手 · 物尽其用</h1>
+    <p class="sub">让闲置找到新主人，让校园生活更绿色</p>
+    <div class="banner-illustration right">
+        <svg width="90" height="90" viewBox="0 0 80 80" stroke="#f97316" stroke-width="1.2" fill="none" class="handdrawn-icon">
+            <!-- water cup -->
+            <path d="M28 22c0-6 24-6 24 0v36a4 4 0 01-4 4H32a4 4 0 01-4-4V22z"/>
+            <path d="M22 24h4M54 24h4" stroke-width="1" opacity="0.7"/>
+            <path d="M36 30c0-4 8-4 8 0" stroke-width="1" opacity="0.4"/>
+            <path d="M32 40a8 8 0 0016 0" stroke-width="1" opacity="0.3"/>
+            <path d="M30 58l-6 10M50 58l6 10" stroke-width="1" opacity="0.5"/>
+            <!-- leaf -->
+            <path d="M56 14c-2 6 4 12 8 8s-2-10-8-8z" stroke-width="1" opacity="0.4"/>
+        </svg>
+    </div>
+</div>
+
+<!-- ===== Category Nav ===== -->
+<div class="category-nav">
+    <div class="cats">
+        <a href="{% url 'goods:goods' %}" class="cat-item {% if not current_category %}cat-active{% endif %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="#2563eb" stroke-width="1.6" fill="none" class="handdrawn-icon">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+            </svg>
+            全部
+        </a>
+        {% for cat in categories %}
+        <a href="{% url 'goods:goods' %}?category={{ cat.id }}" class="cat-item {% if current_category == cat.id %}cat-active{% endif %}">
+            {% if '数码' in cat.name %}
+            <svg width="18" height="18" viewBox="0 0 32 32" stroke="#2563eb" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                <path d="M8 18c-4 0-6-2-6-6s2-6 6-6h16c4 0 6 2 6 6s-2 6-6 6"/>
+                <path d="M8 18v8a4 4 0 004 4h8a4 4 0 004-4v-8"/>
+                <path d="M12 22h8" stroke-width="1.2"/>
+            </svg>
+            {% elif '教材' in cat.name or '图书' in cat.name or '课本' in cat.name or '文具' in cat.name or '办公' in cat.name %}
+            <svg width="18" height="18" viewBox="0 0 32 32" stroke="#2563eb" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                <path d="M6 24V6a2 2 0 012-2h16a2 2 0 012 2v18"/>
+                <path d="M6 24a2 2 0 002 2h18"/>
+                <path d="M12 10h8" stroke-width="1.2"/>
+                <path d="M12 14h6" stroke-width="1.2"/>
+            </svg>
+            {% elif '运动' in cat.name or '健身' in cat.name %}
+            <svg width="18" height="18" viewBox="0 0 32 32" stroke="#f97316" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                <rect x="10" y="12" width="12" height="8" rx="3"/>
+                <rect x="2" y="14" width="8" height="4" rx="2"/>
+                <rect x="22" y="14" width="8" height="4" rx="2"/>
+                <path d="M14 16h4" stroke-width="1"/>
+            </svg>
+            {% elif '箱包' in cat.name or '服饰' in cat.name or '鞋' in cat.name %}
+            <svg width="18" height="18" viewBox="0 0 32 32" stroke="#f97316" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                <path d="M8 14h16v12a2 2 0 01-2 2H10a2 2 0 01-2-2V14z"/>
+                <path d="M12 14V8c0-2 2-4 4-4s4 2 4 4v6"/>
+                <path d="M12 20h8" stroke-width="1.2" opacity="0.4"/>
+            </svg>
+            {% elif '生活' in cat.name or '宿舍' in cat.name %}
+            <svg width="18" height="18" viewBox="0 0 32 32" stroke="#2563eb" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                <rect x="8" y="10" width="16" height="14" rx="2"/>
+                <path d="M12 10V6c0-2 2-3 4-3s4 1 4 3v4"/>
+                <path d="M12 18h8" stroke-width="1.2"/>
+            </svg>
+            {% elif '零食' in cat.name or '饮品' in cat.name or '美妆' in cat.name or '护肤' in cat.name %}
+            <svg width="18" height="18" viewBox="0 0 32 32" stroke="#f97316" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                <path d="M20 8c4 0 6 3 6 6v10a4 4 0 01-4 4H10a4 4 0 01-4-4V14c0-3 2-6 6-6"/>
+                <path d="M14 8V4a2 2 0 014 0v4"/>
+                <path d="M12 14h8" stroke-width="1.2" opacity="0.4"/>
+            </svg>
+            {% elif '其他' in cat.name %}
+            <svg width="18" height="18" viewBox="0 0 32 32" stroke="#2563eb" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                <circle cx="16" cy="14" r="8"/>
+                <path d="M16 6V2M16 26v4M6 14H2M30 14h-4" stroke-width="1.2" opacity="0.5"/>
+                <circle cx="16" cy="14" r="2" fill="#2563eb" fill-opacity="0.15"/>
+            </svg>
+            {% else %}
+            <svg width="18" height="18" viewBox="0 0 32 32" stroke="#2563eb" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                <rect x="8" y="8" width="16" height="18" rx="2"/>
+                <path d="M12 26v4M20 26v4" stroke-width="1"/>
+                <path d="M12 14h8" stroke-width="1.2" opacity="0.4"/>
+            </svg>
+            {% endif %}
+            {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+    <form class="search-box" method="GET" action="{% url 'goods:goods' %}">
+        {% if current_category %}
+        <input type="hidden" name="category" value="{{ current_category }}">
+        {% endif %}
+        <button type="submit" style="background:none;border:none;padding:0;line-height:1;">
+            <svg width="16" height="16" viewBox="0 0 28 28" stroke="#94a3b8" stroke-width="1.8" fill="none" class="handdrawn-icon" style="cursor:pointer;">
+                <circle cx="12" cy="12" r="8"/>
+                <path d="M18 18l6 6"/>
+            </svg>
+        </button>
+        <input type="text" name="q" placeholder="搜索二手好物..." value="{{ keyword }}" maxlength="50">
+    </form>
+</div>
+
+<!-- ===== Goods Grid ===== -->
+<div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+    {% for good in goods_list %}
+    <div class="col" data-good-id="{{ good.id }}" data-active="{{ good.is_active|lower }}">
+        {% if good.is_active %}
+        <a href="{% url 'goods:category' good.id %}" class="text-decoration-none">
+        {% else %}
+        <div class="text-decoration-none" style="cursor:default;">
+        {% endif %}
+            <div class="goods-card" {% if not good.is_active %}style="opacity:0.75;"{% endif %}>
+                {% if not good.is_active %}
+                <div style="position:absolute;inset:0;border-radius:14px;z-index:2;display:flex;align-items:flex-start;justify-content:flex-end;padding:10px;">
+                    <span style="background:#64748b;color:#fff;padding:3px 14px;border-radius:20px;font-size:0.72rem;font-weight:500;letter-spacing:1px;">已售空</span>
+                </div>
+                {% endif %}
+
+                <svg class="deco-corner" style="top:2px;right:2px;z-index:3;" width="16" height="16" viewBox="0 0 24 24" stroke="#f97316" stroke-width="0.8"><path d="M4 20L20 4M4 4l16 16"/></svg>
+                <svg class="deco-corner" style="bottom:2px;left:2px;z-index:3;" width="14" height="14" viewBox="0 0 24 24" stroke="#2563eb" stroke-width="0.8"><circle cx="12" cy="12" r="8"/></svg>
+
+                <div class="card-img-wrapper d-flex align-items-center justify-content-center" style="height: 170px; background: #f8fafc;">
+                    {% if good.image %}
+                    <img src="{% url 'goods:serve_image' good.id %}" class="card-img-top" alt="{{ good.title }}" loading="lazy">
+                    {% else %}
+                    <svg width="48" height="48" viewBox="0 0 48 48" stroke="#cbd5e1" stroke-width="1.4" fill="none" class="handdrawn-icon">
+                        <rect x="8" y="12" width="32" height="28" rx="3"/>
+                        <path d="M16 12V8a2 2 0 012-2h12a2 2 0 012 2v4"/>
+                        <path d="M18 26l6 6 12-12" stroke-width="1.6"/>
+                    </svg>
+                    {% endif %}
+                </div>
+                <div class="card-body text-center">
+                    <div class="card-title">{{ good.title }}</div>
+                    <div class="price mb-1">¥{{ good.price }}</div>
+                    <div class="date">上架时间：{{ good.create_time|date:"Y-m-d" }}</div>
+                </div>
+            </div>
+        {% if good.is_active %}
+        </a>
+        {% else %}
+        </div>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <p class="text-muted fs-5" style="color: #94a3b8 !important;">暂无二手商品，敬请期待</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{% if request.GET.published %}
+<script>
+(function() {
+    var overlay = document.createElement('div');
+    overlay.id = 'publishCelebrate';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(30,41,59,0.35);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = '<div style="background:#fff;border-radius:20px;padding:36px 40px 30px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.12);position:relative;">' +
+        '<button onclick="this.closest(\'#publishCelebrate\').remove()" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.4rem;color:#94a3b8;cursor:pointer;line-height:1;">×</button>' +
+        '<svg width="64" height="64" viewBox="0 0 64 64" stroke="#f97316" stroke-width="1.4" fill="none" class="handdrawn-icon mb-3">' +
+            '<rect x="14" y="10" width="36" height="44" rx="3"/>' +
+            '<path d="M14 22h36"/>' +
+            '<path d="M24 34l6 6 10-12"/>' +
+        '</svg>' +
+        '<h5 style="color:#1e293b;font-weight:600;margin-bottom:6px;">🎉 发布成功！</h5>' +
+        '<p style="color:#64748b;font-size:0.92rem;margin-bottom:4px;">你的宝贝已上架，等待有缘人 🌱</p>' +
+        '<p style="color:#94a3b8;font-size:0.85rem;margin-bottom:20px;">让物品继续它的故事，而不是停在角落</p>' +
+        '<button onclick="this.closest(\'#publishCelebrate\').remove()" style="background:var(--orange);color:#fff;border:none;border-radius:20px;padding:8px 28px;font-size:0.9rem;cursor:pointer;">我知道了</button>' +
+    '</div>';
+    document.body.appendChild(overlay);
+    setTimeout(function() {
+        var el = document.getElementById('publishCelebrate');
+        if (el) el.remove();
+    }, 5000);
+})();
+</script>
+{% endif %}
+<script>
+(function() {
+    var knownIds = {};
+    var banner = document.createElement('div');
+    banner.id = 'newGoodsBanner';
+    banner.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9998;background:#2563eb;color:#fff;padding:10px 24px;border-radius:12px;font-size:0.88rem;font-weight:500;cursor:pointer;box-shadow:0 4px 24px rgba(37,99,235,0.3);display:none;transition:opacity 0.3s;white-space:nowrap;';
+    banner.addEventListener('click', function() { location.reload(); });
+    document.body.appendChild(banner);
+
+    // 先拉取全量商品ID，再启动轮询
+    fetch('{% url "goods:goods_list" %}')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.code === 200 && data.data) {
+                data.data.forEach(function(item) {
+                    knownIds[item.id] = true;
+                });
+            }
+        })
+        .catch(function() {})
+        .finally(function() {
+            setInterval(function() {
+                fetch('{% url "goods:goods_list" %}')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.code !== 200 || !data.data) return;
+                        var newCount = 0;
+                        data.data.forEach(function(item) {
+                            if (item.is_active === false) {
+                                var col = document.querySelector('[data-good-id="' + item.id + '"]');
+                                if (col && col.dataset.active !== 'false') {
+                                    col.dataset.active = 'false';
+                                    var card = col.querySelector('.goods-card');
+                                    if (!card || card.querySelector('.sold-overlay')) return;
+                                    card.style.opacity = '0.75';
+                                    var link = col.querySelector('a.text-decoration-none');
+                                    if (link) link.style.pointerEvents = 'none';
+                                    var overlay = document.createElement('div');
+                                    overlay.className = 'sold-overlay';
+                                    overlay.style.cssText = 'position:absolute;inset:0;border-radius:14px;z-index:2;display:flex;align-items:flex-start;justify-content:flex-end;padding:10px;';
+                                    overlay.innerHTML = '<span style="background:#64748b;color:#fff;padding:3px 14px;border-radius:20px;font-size:0.72rem;font-weight:500;letter-spacing:1px;">已售空</span>';
+                                    card.appendChild(overlay);
+                                }
+                            } else if (!knownIds[item.id]) {
+                                newCount++;
+                                knownIds[item.id] = true;
+                            }
+                        });
+                        if (newCount > 0) {
+                            banner.textContent = '有 ' + newCount + ' 件新商品上架！！！';
+                            banner.style.display = 'block';
+                            setTimeout(function() { location.reload(); }, 2000);
+                        }
+                    })
+                    .catch(function() {});
+            }, 15000);
+        });
+})();
+</script>
+{% endblock %}
