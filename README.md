@@ -29,6 +29,17 @@ python manage.py runserver
 
 浏览器访问：http://127.0.0.1:8000
 
-## 说明
+## Render 在线部署
 
-本项目为课程/竞赛作品，数据库配置通过环境变量读取，请勿将 `.env` 提交到 Git。
+1. 在 [Render](https://render.com) 创建免费 PostgreSQL 数据库
+2. 创建 Web Service，连接 GitHub 仓库 `campus-second-hand`
+3. 配置：
+   - **Build Command**: `./build.sh`
+   - **Start Command**: `gunicorn campus_second_hand.wsgi:application`
+4. 环境变量：
+   - `DATABASE_URL`：从 PostgreSQL 自动关联
+   - `SECRET_KEY`：随机字符串
+   - `DEBUG`：`False`
+   - `PYTHON_VERSION`：`3.12.0`
+
+本地仍用 MySQL（`.env`），线上用 PostgreSQL（`DATABASE_URL`）。
