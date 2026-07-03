@@ -20,5 +20,5 @@
 1. 服务器安装 Python、MySQL、Nginx
 2. 上传代码，配置 `.env`（数据库、`ALLOWED_HOSTS`、`DEBUG=False` 等）
 3. `pip install -r requirements.txt`
-4. `python manage.py migrate` 与 `python manage.py collectstatic`
+4. 进行数据库迁移：`python manage.py migrate` 
 5. 配置 Gunicorn 系统服务与 Nginx（`/static/`、`/media/`）
