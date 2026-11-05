@@ -43,9 +43,19 @@ SECRET_KEY = os.environ.get(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+# 默认 False（生产安全）：DEBUG=True 会在报错页暴露源码、settings（含密钥/密码）、SQL 语句
+# 本地开发需要在 .env 中显式写 DEBUG=True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+# 生产必须显式配置域名/IP，否则 400。默认只放行本机，避免线上漏配也"能跑"
+ALLOWED_HOSTS = [
+    host.strip() for host in os.environ.get(
+        'ALLOWED_HOSTS', '127.0.0.1,localhost'
+    ).split(',') if host.strip()
+]
+
+# 登录相关：@login_required 重定向目标，避免跳到不存在的默认 /accounts/login/ 导致 404
+LOGIN_URL = '/login/'
 
 
 # Application definition
@@ -147,9 +157,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+# 国内项目用上海时区：存库仍为 UTC（USE_TZ=True），仅展示时按此时区转换
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -165,17 +176,23 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS：默认只允许白名单来源跨域携带凭证（cookie）
+# 注意：CORS_ALLOW_ALL_ORIGINS 与 CORS_ALLOW_CREDENTIALS 同时为 True，
+# 等于允许任意站点带用户 cookie 调用本项目接口（含下单/付款/下架），故不再默认全放开
+CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False').lower() == 'true'
+CORS_ALLOWED_ORIGINS = [
+    origin.strip() for origin in os.environ.get(
+        'CORS_ALLOWED_ORIGINS',
+        'http://127.0.0.1:8000,http://localhost:8000'
+    ).split(',') if origin.strip()
+]
 CORS_ALLOW_CREDENTIALS = True
 
-_render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if _render_host:
-    CSRF_TRUSTED_ORIGINS = [f'https://{_render_host}']
-else:
-    CSRF_TRUSTED_ORIGINS = [
-        'https://*.ngrok-free.dev',
-        'http://*.ngrok-free.dev',
-    ]
+# CSRF 受信来源：上线用 HTTPS 域名访问时，POST 必须把 https://域名 配进 .env，否则一律 403
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -185,4 +202,57 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# ---- 日志 ----
+# DEBUG=False 后报错页不再显示堆栈，线上排错只能靠日志文件
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[{asctime}] {levelname} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOGS_DIR / 'app.log',
+            'maxBytes': 5 * 1024 * 1024,
+            'backupCount': 3,
+            'encoding': 'utf-8',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console', 'file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
+
+# ---- 生产安全开关 ----
+# 纯 HTTP 部署（直接用 IP 访问）时开启会被 301 到不可用地址，
+# 所以用 .env 的 SECURE_SSL 显式控制：上了 HTTPS 再打开
+if not DEBUG and os.environ.get('SECURE_SSL', 'False').lower() == 'true':
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
