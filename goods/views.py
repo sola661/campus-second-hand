@@ -86,7 +86,8 @@ def goods(request):
     category_id = request.GET.get('category')
     keyword = request.GET.get('q', '').strip()
 
-    goods_qs = Goods.objects.all().order_by('-create_time')
+    goods_qs = Goods.objects.filter(is_active=True).order_by('-create_time')
+    # 下面的两个分支都是服务于?后面的参数；
     if category_id:
         goods_qs = goods_qs.filter(category_id=category_id)
     if keyword:
@@ -117,6 +118,13 @@ def publish(request):
                 'error': '标题和价格为必填项',
             })
 
+        # 图片大小限制：前端 accept 只是选择器提示，可被绕过，服务端必须兜底
+        if image and image.size > 5 * 1024 * 1024:
+            return render(request, 'publish_goods.html', {
+                'categories': Category.objects.all(),
+                'error': '图片不能超过5MB，请压缩后再上传',
+            })
+
         good = Goods(
             title=title,
             description=description,
@@ -127,13 +135,20 @@ def publish(request):
             good.category_id = int(category_id)
         if image:
             from django.core.files.base import ContentFile
-            img = Image.open(image)
-            if img.mode in ('RGBA', 'LA', 'P'):
-                bg = Image.new('RGB', img.size, (255, 255, 255))
-                bg.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
-                img = bg
-            buf = io.BytesIO()
-            img.save(buf, 'JPEG', quality=80)
+            # 异常保护：损坏图片或伪装成图片的文件在解码/转码时抛错，统一拦截，不回 500
+            try:
+                img = Image.open(image)
+                if img.mode in ('RGBA', 'LA', 'P'):
+                    bg = Image.new('RGB', img.size, (255, 255, 255))
+                    bg.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                    img = bg
+                buf = io.BytesIO()
+                img.save(buf, 'JPEG', quality=80)
+            except Exception:
+                return render(request, 'publish_goods.html', {
+                    'categories': Category.objects.all(),
+                    'error': '图片文件损坏或格式不支持，请更换图片后重试',
+                })
             name = f'{int(time.time())}{random.randint(1000,9999)}.jpg'
             good.image.save(name, ContentFile(buf.getvalue()), save=False)
         good.save()
@@ -154,7 +169,7 @@ def deactivate(request, good_id):
 def category(request,good_id):
     # 1. 根据商品ID找商品（找不到就返回404，不报错）
     good = get_object_or_404(Goods, id=good_id)
-    # 2. 拿到分类名（无分类则显示“未分类”）
+    # 2. 拿到分类名（无分类则显示"未分类"）
     category_name = good.category.name if good.category else "未分类"
     # 3. 传数据给模板（模板后续写，先返回简单响应）
     context = {
@@ -164,3 +179,17 @@ def category(request,good_id):
     }
     # 先返回一个简单的HTML响应（不用等模板，解决报错）
     return render(request, 'category.html', context)
+
+
+@login_required
+def my_goods(request):
+    # 卖家工作台：查看自己发布的所有商品，按在售/已售下架分组
+    my_goods_list = Goods.objects.filter(user=request.user).order_by('-create_time')
+    on_sale = my_goods_list.filter(is_active=True)
+    off_sale = my_goods_list.filter(is_active=False)
+    context = {
+        'on_sale': on_sale,
+        'off_sale': off_sale,
+        'page_title': '我发布的'
+    }
+    return render(request, 'my_goods.html', context)

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}我发布的 - 校园二手交易平台{% endblock %}
+
+{% block content %}
+<h5 class="fw-semibold mb-4" style="color: #1e293b;">
+    <svg width="22" height="22" viewBox="0 0 24 24" stroke="#2563eb" stroke-width="1.6" fill="none" class="handdrawn-icon me-2">
+        <path d="M3 9l1-5h16l1 5"/>
+        <path d="M3 9h18v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/>
+        <path d="M9 13h6" stroke-width="1.2" opacity="0.4"/>
+    </svg>
+    我发布的商品
+</h5>
+
+<!-- 在售商品 -->
+<h6 class="fw-semibold mb-3" style="color: #1e293b;">
+    在售 <span class="badge rounded-pill" style="background:#dcfce7;color:#166534;font-weight:400;">{{ on_sale|length }}</span>
+</h6>
+
+{% if on_sale %}
+<div class="row g-3 mb-4">
+    {% for good in on_sale %}
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm" style="border-radius: 14px;">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 class="fw-semibold mb-1" style="color: #1e293b;">
+                            <a href="{% url 'goods:category' good.id %}" style="color:#1e293b;text-decoration:none;">{{ good.title }}</a>
+                        </h6>
+                        <small class="text-muted">分类：{{ good.category.name|default:"未分类" }}</small>
+                    </div>
+                    <span class="badge rounded-pill py-1 px-3" style="font-weight: 400; font-size: 0.8rem; background:#dcfce7;color:#166534;">在售</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="price" style="color: var(--orange); font-weight: 700; font-size: 1.1rem;">¥{{ good.price }}</span>
+                    <small class="text-muted">{{ good.create_time|date:"Y-m-d H:i" }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-muted mb-4" style="color:#94a3b8;">暂无在售商品，去<a href="{% url 'goods:publish' %}" style="color: var(--blue);">发布一件</a>吧</p>
+{% endif %}
+
+<!-- 已售/下架商品 -->
+<h6 class="fw-semibold mb-3" style="color: #1e293b;">
+    已售 / 下架 <span class="badge rounded-pill" style="background:#f1f5f9;color:#64748b;font-weight:400;">{{ off_sale|length }}</span>
+</h6>
+
+{% if off_sale %}
+<div class="row g-3">
+    {% for good in off_sale %}
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm" style="border-radius: 14px; opacity: 0.75;">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 class="fw-semibold mb-1" style="color: #1e293b;">{{ good.title }}</h6>
+                        <small class="text-muted">分类：{{ good.category.name|default:"未分类" }}</small>
+                    </div>
+                    <span class="badge rounded-pill py-1 px-3" style="font-weight: 400; font-size: 0.8rem; background:#f1f5f9;color:#64748b;">已售 / 下架</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="price" style="color: var(--orange); font-weight: 700; font-size: 1.1rem;">¥{{ good.price }}</span>
+                    <small class="text-muted">{{ good.create_time|date:"Y-m-d H:i" }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-muted" style="color:#94a3b8;">暂无已售或下架的商品</p>
+{% endif %}
+{% endblock %}

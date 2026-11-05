@@ -6,7 +6,9 @@ urlpatterns = [
     path('goods/list/',views.goods_list,name='goods_list'),
     path('goods/',views.goods,name='goods'),
     path('publish/',views.publish,name='publish'),
+    path('my/',views.my_goods,name='my_goods'),
     path('category/<int:good_id>/', views.category, name='category'),
+    # 商家下架商品的地址;
     path('deactivate/<int:good_id>/', views.deactivate, name='deactivate'),
     path('image/<int:good_id>/', views.serve_image, name='serve_image'),
 ]

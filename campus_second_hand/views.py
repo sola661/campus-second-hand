@@ -4,10 +4,17 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 import re
 
 def is_ajax(request):
     return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+def _login_hint(next_url):
+    """未登录访问受限页面跳转登录页时的统一提示语；无来源返回空串（不显示）。"""
+    if not next_url:
+        return ''
+    return '完成登录即可进行更多操作'
 
 def test_base(request):
     return render(request, 'base.html')
@@ -54,21 +61,18 @@ def register(request):
 
 @csrf_exempt
 def login(request):
+    ctx = {'login_hint': _login_hint(request.GET.get('next', ''))}
     if request.method == 'POST':
         username = (request.POST.get('username') or '').strip()
         password = (request.POST.get('password') or '').strip()
-        if len(username) > 20:
-            msg = '用户名格式不正确'
+        # 用户名/密码格式与注册逻辑保持一致；不匹配按"用户名或密码错误"处理，避免泄露具体原因
+        if not re.match(r'^[\u4e00-\u9fa5a-zA-Z0-9_]{1,20}$', username) or \
+           not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$', password):
+            msg = '用户名或密码错误'
             if is_ajax(request):
                 return JsonResponse({'code': 400, 'msg': msg})
             messages.error(request, msg)
-            return render(request, 'login.html')
-        if len(password) < 6:
-            msg = '密码格式不正确'
-            if is_ajax(request):
-                return JsonResponse({'code': 400, 'msg': msg})
-            messages.error(request, msg)
-            return render(request, 'login.html')
+            return render(request, 'login.html', ctx)
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
@@ -82,10 +86,11 @@ def login(request):
             if is_ajax(request):
                 return JsonResponse({'code': 400, 'msg': msg})
             messages.error(request, msg)
-            return render(request, 'login.html')
+            return render(request, 'login.html', ctx)
     else:
-        return render(request, 'login.html')
+        return render(request, 'login.html', ctx)
 
+@require_POST
 def logout(request):
     django_logout(request) #收回登录通行证；
     return redirect('/goods/goods/')

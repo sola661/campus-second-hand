@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<!-- ===== Banner ===== -->
+<!-- ===== Banner横幅 ===== -->
 <div class="banner-section">
     <div class="banner-illustration left">
         <svg width="90" height="90" viewBox="0 0 80 80" stroke="#2563eb" stroke-width="1.2" fill="none" class="handdrawn-icon">
@@ -214,6 +214,7 @@
             }
         })
         .catch(function() {})
+        
         .finally(function() {
             setInterval(function() {
                 fetch('{% url "goods:goods_list" %}')
