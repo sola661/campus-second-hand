@@ -15,7 +15,8 @@
 | F-09 | 订单状态四种 | orders/models.py:8 |
 | F-10 | DEBUG 默认关闭 | settings.py:48 |
 | F-11 | 时区改为上海 | settings.py:158 |
-| F-12 | CORS 收白名单 + 配置进 .env | settings.py:174 |
+| F-12 | CORS 收白名单 + 配置进 .env | 已被 F-13 取代 |
+| F-13 | 移除 CORS（确定不做前后端分离） | settings.py、requirements.txt |
 
 ---
 
@@ -126,9 +127,19 @@
 - **原因**：模板默认全放开
 - **改法**：默认只信 `127.0.0.1:8000 / localhost:8000`，上线在 `.env` 补域名；`DEBUG` 也走 `.env`
 - **验证**：从其他来源发起跨域请求，响应无 `Access-Control-Allow-Origin`
-- **证据**：settings.py:174-184
+- **证据**：settings.py:174-184（当时）
 - **注意**：项目前后端不分离，当前其实用不到 CORS，已记 BACKLOG D 区待确认
+- **后续**：2026-11 确定不做前后端分离，CORS 已整体移除，见 F-13
 - **时间**：2026-07 早期
+
+### F-13 移除 CORS 配置
+
+- **现象**：项目不分离，`corsheaders` 装了但从不生效，且面试会被追问「不分离为什么有 CORS」
+- **原因**：早期照模板加上，属于无效配置
+- **改法**：删 `INSTALLED_APPS` 的 `corsheaders`、`MIDDLEWARE` 的 `CorsMiddleware`、三行 `CORS_*` 设置、`requirements.txt` 的依赖
+- **验证**：`manage.py check` 0 issues；登录、发布、下单、支付全部正常
+- **证据**：settings.py（无 CORS 相关行）、requirements.txt
+- **时间**：2026-11
 
 ## 原始草稿
 问题1：模块3，用户在未登录状态下点击之前收藏的地址时会直接报404错误；在settings.py里添加 /login/，未登录的用户直接会定向到登录界面，并在登陆页面新增了提示语；

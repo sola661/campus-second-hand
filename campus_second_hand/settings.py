@@ -69,11 +69,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -175,18 +173,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# CORS：默认只允许白名单来源跨域携带凭证（cookie）
-# 注意：CORS_ALLOW_ALL_ORIGINS 与 CORS_ALLOW_CREDENTIALS 同时为 True，
-# 等于允许任意站点带用户 cookie 调用本项目接口（含下单/付款/下架），故不再默认全放开
-CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False').lower() == 'true'
-CORS_ALLOWED_ORIGINS = [
-    origin.strip() for origin in os.environ.get(
-        'CORS_ALLOWED_ORIGINS',
-        'http://127.0.0.1:8000,http://localhost:8000'
-    ).split(',') if origin.strip()
-]
-CORS_ALLOW_CREDENTIALS = True
 
 # CSRF 受信来源：上线用 HTTPS 域名访问时，POST 必须把 https://域名 配进 .env，否则一律 403
 CSRF_TRUSTED_ORIGINS = [

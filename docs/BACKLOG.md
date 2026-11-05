@@ -36,7 +36,7 @@
 
 ## D. 待确认（我不知道这算不算问题）
 
-- [ ] **D-01** 前后端不分离，CORS 是否多余 | settings.py:174-184 | 需要想清楚留着的理由 | 来源:fixes | 状态:待确认
+- [x] ~~**D-01** 前后端不分离，CORS 是否多余~~ | 已确认多余，整体移除 | 见 fixes.md F-13
 - [ ] **D-02** `conn_max_age=600` 与 worker 数的关系 | settings.py:111-118 | 持久连接会不会打满 MySQL `max_connections` | 来源:review | 状态:待确认
 - [ ] **D-03** WhiteNoise 与 Nginx 静态文件职责重叠 | settings.py:81-85 | 两套都在供静态文件，是否必要 | 来源:review | 状态:待确认
 
