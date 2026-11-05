@@ -182,9 +182,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+# 项目没有自建的静态资源目录（原 static/images 已删除），
+# 静态文件只剩 admin 等 app 自带的，collectstatic 会收集到 STATIC_ROOT
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
