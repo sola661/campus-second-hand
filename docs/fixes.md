@@ -8,7 +8,7 @@
 | F-02 | 登出改为 POST | views.py:93 |
 | F-03 | 商品下架后不能再支付 | orders/views.py:89 |
 | F-04 | 已下架商品不占首页 | goods/views.py:89 |
-| F-05 | 图片上传：表单编码 + 大小 + 转码 | goods/views.py:122 |
+| F-05 | 图片上传：表单编码 + 大小 + 转码（含 Nginx 放行） | goods/views.py:122 |
 | F-06 | 订单接口只返回本人订单 | orders/views.py:24 |
 | F-07 | 同商品不能重复下待付款单 | orders/views.py:66 |
 | F-08 | 卖家不能买自己的商品 | orders/views.py:57 |
@@ -63,7 +63,8 @@
 - **改法**：表单加 `enctype="multipart/form-data"`；服务端限 5MB；PIL 打开、统一转 JPEG（quality=80）、透明底铺白；解码失败返回友好错误
 - **验证**：传 6MB 图 → 提示超限；传改为 `.jpg` 的文本文件 → 提示格式不支持
 - **证据**：templates/publish_goods.html:28、goods/views.py:122-151
-- **时间**：2026-07 早期
+- **注意**：线上的 5MB 判断要能生效，前提是 Nginx 放行。Nginx 默认 `client_max_body_size` 只有 1MB，手机拍的照片基本都超，会直接返回 413，请求根本到不了 Django。已在站点配置里设为 `client_max_body_size 8m`：5–8MB 交给 Django 出友好提示，超过 8MB 才由 Nginx 拦截
+- **时间**：2026-07 早期（Nginx 补充：2026-11）
 
 ### F-06 订单接口能查到所有人订单
 
