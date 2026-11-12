@@ -278,9 +278,13 @@ python manage.py runserver
 5. `python manage.py migrate`
 6. `python manage.py collectstatic --noinput`
 7. 确保 `logs/`、`media/` 对 Gunicorn 运行用户可写
-8. `systemctl restart gunicorn`，`nginx -t && systemctl reload nginx`
+8. 重启服务（本项目服务器上的服务名是 `campus.service`），`nginx -t && systemctl reload nginx`
 
-Nginx 需要location：`/media/` 指向 `MEDIA_ROOT`。
+Nginx 侧三项配置缺一不可：
+
+- `/static/` → `STATIC_ROOT`（collectstatic 的产物）
+- `/media/` → `MEDIA_ROOT`（用户上传的图片，目录权限要让 Nginx 可读）
+- `client_max_body_size 8m;` —— 默认只有 1MB，手机拍的照片会直接被 413 拦掉，请求根本到不了 Django 那层 5MB 校验
 
 部署后验证：首页返回 200、样式与图片正常、登录发布下单走通、`logs/app.log` 无 ERROR。
 
