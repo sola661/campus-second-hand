@@ -15,6 +15,7 @@
 | F-09 | 订单状态四种 | orders/models.py:8 |
 | F-10 | DEBUG 默认关闭 | settings.py:48 |
 | F-11 | 时区改为上海 | settings.py:158 |
+| F-12 | Bootstrap 改自托管，去掉 CDN 依赖 | static/vendor/、templates/base.html:8 |
 
 ---
 
@@ -119,6 +120,15 @@
 - **验证**：新发布商品的 `create_time` 显示为北京时间
 - **证据**：settings.py:157-162
 - **时间**：2026-07 早期
+
+### F-12 Bootstrap 走外部 CDN，弱网下页面排版错乱
+
+- **现象**：网站闲置一段时间后首次打开首页，栅格、按钮、间距样式丢失，退出重进或刷新后恢复正常。手机端与电脑端均可复现
+- **原因**：`base.html` 用 `cdn.jsdelivr.net` 引入 Bootstrap 5.3.2。国内访问该 CDN 常年超时或被重置，空闲后连接与 DNS 变冷，首次请求失败 → CSS 未加载就渲染；刷新时命中缓存或重连成功，所以"坏一次好一次"
+- **改法**：把 `bootstrap.min.css`（228KB）与 `bootstrap.bundle.min.js`（79KB）下载到 `static/vendor/`，模板改用 `{% static 'vendor/...' %}`，`settings.py` 恢复 `STATICFILES_DIRS`，由 Nginx 从 `collectstatic` 产物直接提供
+- **验证**：断网状态下首页仍完整渲染；`/static/vendor/bootstrap.min.css` 返回 200；首屏少两个外部请求
+- **证据**：templates/base.html:8、templates/base.html:390、campus_second_hand/settings.py:185-190、static/vendor/
+- **时间**：2026-11
 
 ## 原始草稿
 问题1：模块3，用户在未登录状态下点击之前收藏的地址时会直接报404错误；在settings.py里添加 /login/，未登录的用户直接会定向到登录界面，并在登陆页面新增了提示语；

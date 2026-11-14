@@ -16,7 +16,6 @@ from .models import Orders
 def generate_order_sn():
     return f'ORD{int(time.time())}{random.randint(1000, 9999)}'
 
-
 @login_required #装饰器：确保用户已登录
 def orders_list(request):
     try:
